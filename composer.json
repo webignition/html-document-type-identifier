@@ -1,7 +1,7 @@
 {
     "name": "webignition/html-document-type-identifier",
     "description": "Given the source of an HTML document, identify the document type",
-    "keywords": ["html document doctype identifier"],
+    "keywords": ["html", "document", "doctype"],
     "homepage": "https://github.com/webignition/html-document-type-identifier",
     "type": "library",
     "license": "MIT",

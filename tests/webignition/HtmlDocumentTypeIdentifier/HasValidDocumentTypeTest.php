@@ -74,9 +74,15 @@ class HasValidDocumentTypeTest extends BaseTest {
         $this->assertTrue($identifier->hasValidDocumentType());
     }    
     
-    public function testXml10Basic() {
+    public function testXhml10Basic() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10basic.html'));        
         $this->assertTrue($identifier->hasValidDocumentType());
-    }     
+    } 
+    
+    public function testInvalidXhtml10Xhtml11Mixup() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('invalid-xhtml10-xhtml11-mixup.html'));        
+        $this->assertFalse($identifier->hasValidDocumentType());        
+    }
 }

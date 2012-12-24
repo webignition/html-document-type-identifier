@@ -79,5 +79,13 @@ class GetDocumentTypeTest extends BaseTest {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10basic.html'));        
         $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">', $identifier->getDocumentTypeString());
-    }     
+    }
+    
+    
+    public function testNoDoctype() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('no-doctype.html'));        
+        
+        $this->assertEquals('', $identifier->getDocumentTypeString());
+    }    
 }

@@ -42,7 +42,13 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @param string $html
      */
-    public function setHtml($html) {
+    public function setHtml($html) {        
+        if (!$this->hasDoctypeLine($html)) {
+            $this->documentTypeObject = null;
+            $this->documentTypeString = '';
+            return;
+        }
+        
         $currentLibXmlUseInternalErrors = libxml_use_internal_errors();
         
         libxml_use_internal_errors(true);
@@ -51,10 +57,23 @@ class HtmlDocumentTypeIdentifier {
         $domDocument->loadHTML($html);
         
         libxml_use_internal_errors($currentLibXmlUseInternalErrors);
-
+        
         
         $this->documentTypeObject = $domDocument->doctype;
         $this->documentTypeString = $domDocument->doctype->ownerDocument->saveXml($domDocument->doctype);  
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasDocumentType() {
+        if (is_null($this->documentTypeObject)) {
+            return false;
+        }
+        
+        return $this->documentTypeString != '';
     }
     
     
@@ -84,5 +103,13 @@ class HtmlDocumentTypeIdentifier {
     }
     
     
+    /**
+     * 
+     * @param string $html
+     * @return boolean
+     */
+    private function hasDoctypeLine($html) {        
+        return preg_match('/^<!DOCTYPE\s+(html|HTML)/', $html) > 0;
+    }
     
 }

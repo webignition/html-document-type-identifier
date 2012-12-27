@@ -93,4 +93,11 @@ class GetDocumentTypeTest extends BaseTest {
         $identifier = new HtmlDocumentTypeIdentifier();
         $this->assertEquals('', $identifier->getDocumentTypeString());        
     }
+    
+    
+    public function testWithBlankLinesBeforeDoctypeDeclaration() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('blank-lines-before-doctype.html'));
+        $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());        
+    }
 }

@@ -88,8 +88,12 @@ class HasValidDocumentTypeTest extends BaseTest {
     
     public function testNoDoctype() {
         $identifier = new HtmlDocumentTypeIdentifier();        
-        $identifier->setHtml($this->getFixture('no-doctype.html'));        
-        
+        $identifier->setHtml($this->getFixture('no-doctype.html'));
         $this->assertFalse($identifier->hasValidDocumentType());
-    }      
+    }
+    
+    public function testWithNoDocument() {
+        $identifier = new HtmlDocumentTypeIdentifier();
+        $this->assertFalse($identifier->hasValidDocumentType()); 
+    }    
 }

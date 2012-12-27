@@ -84,8 +84,13 @@ class GetDocumentTypeTest extends BaseTest {
     
     public function testNoDoctype() {
         $identifier = new HtmlDocumentTypeIdentifier();        
-        $identifier->setHtml($this->getFixture('no-doctype.html'));        
-        
+        $identifier->setHtml($this->getFixture('no-doctype.html'));
         $this->assertEquals('', $identifier->getDocumentTypeString());
     }    
+    
+    
+    public function testWithNoDocument() {
+        $identifier = new HtmlDocumentTypeIdentifier();
+        $this->assertEquals('', $identifier->getDocumentTypeString());        
+    }
 }

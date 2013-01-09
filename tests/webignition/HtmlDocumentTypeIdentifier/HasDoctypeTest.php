@@ -74,7 +74,7 @@ class HasDocumentTypeTest extends BaseTest {
         $this->assertTrue($identifier->hasDocumentType()); 
         
         $identifier->setHtml($this->getFixture('html5-mixedcase.html'));        
-        $this->assertTrue($identifier->hasDocumentType());         
+        $this->assertTrue($identifier->hasDocumentType());
     }      
     
     public function testHtml2() {

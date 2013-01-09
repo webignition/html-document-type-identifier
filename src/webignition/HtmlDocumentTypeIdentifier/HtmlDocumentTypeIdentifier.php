@@ -42,7 +42,7 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @param string $html
      */
-    public function setHtml($html) {        
+    public function setHtml($html) {
         if (!$this->hasDoctypeLine($html)) {
             $this->documentTypeObject = null;
             $this->documentTypeString = '';
@@ -61,6 +61,8 @@ class HtmlDocumentTypeIdentifier {
         
         $this->documentTypeObject = $domDocument->doctype;
         $this->documentTypeString = $domDocument->doctype->ownerDocument->saveXml($domDocument->doctype);  
+        
+        $this->documentTypeString = preg_replace('/^\<\!doctype html/i', '<!DOCTYPE html', $this->documentTypeString);
     }
     
     

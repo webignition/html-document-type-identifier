@@ -11,19 +11,19 @@ class GetDocumentTypeTest extends BaseTest {
     public function testHtml401Strict() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401strict.html'));        
-        $this->assertEquals('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', $identifier->getDocumentTypeString());
+        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', $identifier->getDocumentTypeString());
     }
   
     public function testHtml401Transitional() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401transitional.html'));        
-        $this->assertEquals('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">', $identifier->getDocumentTypeString());
+        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">', $identifier->getDocumentTypeString());
     }    
     
     public function testHtml401Frameset() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401frameset.html'));        
-        $this->assertEquals('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">', $identifier->getDocumentTypeString());
+        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">', $identifier->getDocumentTypeString());
     }     
     
     public function testXhtml10Strict() {

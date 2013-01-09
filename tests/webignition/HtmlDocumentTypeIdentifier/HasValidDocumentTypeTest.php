@@ -60,6 +60,12 @@ class HasValidDocumentTypeTest extends BaseTest {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html5.html'));        
         $this->assertTrue($identifier->hasValidDocumentType());
+        
+        $identifier->setHtml($this->getFixture('html5-lowercase.html'));        
+        $this->assertTrue($identifier->hasValidDocumentType());        
+        
+        $identifier->setHtml($this->getFixture('html5-mixedcase.html'));        
+        $this->assertTrue($identifier->hasValidDocumentType());        
     }      
     
     public function testHtml2() {

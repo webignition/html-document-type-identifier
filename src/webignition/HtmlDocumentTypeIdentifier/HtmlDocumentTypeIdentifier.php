@@ -42,7 +42,7 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @param string $html
      */
-    public function setHtml($html) {
+    public function setHtml($html) {        
         if (!$this->hasDoctypeLine($html)) {
             $this->documentTypeObject = null;
             $this->documentTypeString = '';
@@ -110,7 +110,10 @@ class HtmlDocumentTypeIdentifier {
      * @param string $html
      * @return boolean
      */
-    private function hasDoctypeLine($html) {        
+    private function hasDoctypeLine($html) { 
+        // Remove UTF-8 BOM preceding doctype if present
+        $html = preg_replace("/^\xef\xbb\xbf/", '', $html);       
+        
         return preg_match('/^<!doctype\s+(html)/i', trim($html)) > 0;
     }
     

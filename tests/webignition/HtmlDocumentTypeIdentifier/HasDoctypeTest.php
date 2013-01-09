@@ -15,12 +15,18 @@ class HasDocumentTypeTest extends BaseTest {
         
         $identifier->setHtml($this->getFixture('html401strict-single-line-doctype.html'));
         $this->assertTrue($identifier->hasDocumentType());        
+        
+        $identifier->setHtml($this->getFixture('html401strict-lowercase.html'));
+        $this->assertTrue($identifier->hasDocumentType());         
     }
   
     public function testHtml401Transitional() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401transitional.html'));        
         $this->assertTrue($identifier->hasDocumentType()); 
+        
+        $identifier->setHtml($this->getFixture('html401transitional-lowercase.html'));        
+        $this->assertTrue($identifier->hasDocumentType());         
     }    
     
     public function testHtml401Frameset() {
@@ -63,6 +69,12 @@ class HasDocumentTypeTest extends BaseTest {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html5.html'));        
         $this->assertTrue($identifier->hasDocumentType()); 
+        
+        $identifier->setHtml($this->getFixture('html5-lowercase.html'));        
+        $this->assertTrue($identifier->hasDocumentType()); 
+        
+        $identifier->setHtml($this->getFixture('html5-mixedcase.html'));        
+        $this->assertTrue($identifier->hasDocumentType());         
     }      
     
     public function testHtml2() {

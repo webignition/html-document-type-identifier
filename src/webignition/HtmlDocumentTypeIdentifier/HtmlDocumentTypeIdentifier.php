@@ -109,7 +109,7 @@ class HtmlDocumentTypeIdentifier {
      * @return boolean
      */
     private function hasDoctypeLine($html) {        
-        return preg_match('/^<!DOCTYPE\s+(html|HTML)/', trim($html)) > 0;
+        return preg_match('/^<!doctype\s+(html)/i', trim($html)) > 0;
     }
     
 }

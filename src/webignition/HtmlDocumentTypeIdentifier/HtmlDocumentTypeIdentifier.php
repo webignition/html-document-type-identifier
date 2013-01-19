@@ -92,16 +92,20 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @return boolean
      */
-    public function hasValidDocumentType() {
+    public function hasValidDocumentType() {        
         if (!$this->documentTypeObject instanceof \DOMDocumentType) {
             return false;
         }
         
-        if (isset($this->publicIdToSystemIdMap[$this->documentTypeObject->publicId])) {
-            return $this->documentTypeObject->systemId == $this->publicIdToSystemIdMap[$this->documentTypeObject->publicId];
+        if (strtolower($this->documentTypeObject->name) != 'html') {
+            return false;
         }
         
-        return in_array($this->documentTypeString, $this->nonDtdDocumentTypeStrings);
+        if (in_array($this->documentTypeString, $this->nonDtdDocumentTypeStrings)) {
+            return true;
+        }
+        
+        return isset($this->publicIdToSystemIdMap[$this->documentTypeObject->publicId]);
     }
     
     

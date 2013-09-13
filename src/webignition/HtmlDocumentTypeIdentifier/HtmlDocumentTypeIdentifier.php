@@ -6,6 +6,9 @@ namespace webignition\HtmlDocumentTypeIdentifier;
  */
 class HtmlDocumentTypeIdentifier {
     
+    const DOCTYPE_LINE_PATTERN = '/^<!doctype\s+(html)/i';
+    const XML_DECLARATION_LINE_PATTERN = '/^<\?xml\s+/i';
+    
     private $publicIdToSystemIdMap = array(
         '-//W3C//DTD HTML 4.01//EN' => 'http://www.w3.org/TR/html4/strict.dtd',
         '-//W3C//DTD HTML 4.01 Transitional//EN' => 'http://www.w3.org/TR/html4/loose.dtd',
@@ -115,10 +118,65 @@ class HtmlDocumentTypeIdentifier {
      * @return boolean
      */
     private function hasDoctypeLine($html) { 
-        // Remove UTF-8 BOM preceding doctype if present
-        $html = preg_replace("/^\xef\xbb\xbf/", '', $html);       
+        $html = preg_replace("/^\xef\xbb\xbf/", '', $html); 
         
-        return preg_match('/^<!doctype\s+(html)/i', trim($html)) > 0;
+        $nonBlankLines = $this->getNonBlankLines($html);
+        if (count($nonBlankLines) === 0) {
+            return false;
+        }
+        
+        if (count($nonBlankLines) === 1) {
+            return $this->isDoctypeLine($nonBlankLines[0]);
+        }
+        
+        return $this->isDoctypeLine($nonBlankLines[0]) || ($this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1]));
+        
+        if (count($nonBlankLines) < 2) {
+            return false;
+        }
+        
+        return $this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1]);
+    }
+    
+
+    /**
+     * 
+     * @param string $line
+     * @return boolean
+     */    
+    private function isDoctypeLine($line) {
+        return preg_match(self::DOCTYPE_LINE_PATTERN, $line) > 0;
+    }
+    
+    
+    /**
+     * 
+     * @param string $line
+     * @return boolean
+     */
+    private function isXmlDeclarationLine($line) {                
+        return preg_match(self::XML_DECLARATION_LINE_PATTERN, $line) > 0;
+    }
+    
+    
+    
+    /**
+     * 
+     * @param string $html
+     * @return array
+     */
+    private function getNonBlankLines($html) {        
+        $lines = explode("\n", $html);
+        $nonBlankLines = array();
+        
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line !== '') {
+                $nonBlankLines[] = $line;
+            }
+        }
+        
+        return $nonBlankLines;
     }
     
 }

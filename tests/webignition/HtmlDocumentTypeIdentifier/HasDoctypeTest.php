@@ -116,4 +116,11 @@ class HasDocumentTypeTest extends BaseTest {
         $identifier->setHtml($this->getFixture('blank-lines-before-doctype.html'));
         $this->assertTrue($identifier->hasDocumentType());
     }    
+    
+    public function testXhtmlWithXmlPrefix() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));
+        
+        $this->assertTrue($identifier->hasDocumentType());
+    }    
 }

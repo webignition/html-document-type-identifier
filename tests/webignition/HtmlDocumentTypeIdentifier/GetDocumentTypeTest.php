@@ -100,4 +100,11 @@ class GetDocumentTypeTest extends BaseTest {
         $identifier->setHtml($this->getFixture('blank-lines-before-doctype.html'));
         $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());        
     }
+    
+    public function testXhtmlWithXmlPrefix() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));
+        
+        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', $identifier->getDocumentTypeString());            
+    }
 }

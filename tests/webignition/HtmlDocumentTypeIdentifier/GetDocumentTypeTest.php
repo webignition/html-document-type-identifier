@@ -102,9 +102,16 @@ class GetDocumentTypeTest extends BaseTest {
     }
     
     public function testXhtmlWithXmlPrefix() {
-        $identifier = new HtmlDocumentTypeIdentifier();        
-        $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));
+        $identifier = new HtmlDocumentTypeIdentifier();      
+        $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));        
         
         $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', $identifier->getDocumentTypeString());            
+    }
+    
+    public function testXhtmlRfda() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('xhtmlrdfa.html'));
+        
+        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">', $identifier->getDocumentTypeString());                    
     }
 }

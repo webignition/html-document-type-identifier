@@ -122,5 +122,12 @@ class HasDocumentTypeTest extends BaseTest {
         $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));
         
         $this->assertTrue($identifier->hasDocumentType());
+    }  
+    
+    public function testXhtmlRfda() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('xhtmlrdfa.html'));
+        
+        $this->assertTrue($identifier->hasDocumentType());
     }    
 }

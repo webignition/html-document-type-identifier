@@ -21,6 +21,7 @@ class HtmlDocumentTypeIdentifier {
         '-//IETF//DTD HTML 2.0//EN' => '',
         '-//W3C//DTD HTML 3.2 Final//EN' => '',
         '-//W3C//DTD XHTML Basic 1.0//EN' => 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd',
+        '-//W3C//DTD XHTML+RDFa 1.0//EN' => 'http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd',
     );
     
     private $nonDtdDocumentTypeStrings = array(

@@ -107,5 +107,12 @@ class HasValidDocumentTypeTest extends BaseTest {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('blank-lines-before-doctype.html'));
         $this->assertTrue($identifier->hasValidDocumentType());
-    }    
+    }   
+    
+    public function testXhtmlRfda() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('xhtmlrdfa.html'));
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }      
 }

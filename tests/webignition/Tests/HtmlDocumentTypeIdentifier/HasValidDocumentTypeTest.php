@@ -1,5 +1,7 @@
 <?php
 
+namespace webignition\Tests\HtmlDocumentTypeIdentifier;
+
 use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
 class HasValidDocumentTypeTest extends BaseTest {

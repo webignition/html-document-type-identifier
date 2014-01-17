@@ -12,7 +12,14 @@
         }
     ],
     "autoload": {
-        "psr-0": { "": "src/" }
-    },    
+        "psr-0": {
+            "webignition\\Tests": "tests/",
+            "": "src/"
+        }
+    },
+    "require-dev": {
+        "symfony/class-loader": "*",
+        "phpunit/phpunit": "3.7.*"
+    },            
     "minimum-stability":"dev"
 }

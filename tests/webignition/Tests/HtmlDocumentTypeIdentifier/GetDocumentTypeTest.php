@@ -116,4 +116,10 @@ class GetDocumentTypeTest extends BaseTest {
         
         $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">', $identifier->getDocumentTypeString());                    
     }
+    
+    public function testHtml5WithPrecedingComment() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('html5-with-preceding-comment.html'));        
+        $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());
+    }        
 }

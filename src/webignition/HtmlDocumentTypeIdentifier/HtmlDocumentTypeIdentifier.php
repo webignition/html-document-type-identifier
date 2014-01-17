@@ -8,6 +8,7 @@ class HtmlDocumentTypeIdentifier {
     
     const DOCTYPE_LINE_PATTERN = '/^<!doctype\s+(html)/i';
     const XML_DECLARATION_LINE_PATTERN = '/^<\?xml\s+/i';
+    const COMMENT_LINE_PATTERN = '/^<!--/i';
     
     private $publicIdToSystemIdMap = array(
         '-//W3C//DTD HTML 4.01//EN' => 'http://www.w3.org/TR/html4/strict.dtd',
@@ -130,13 +131,19 @@ class HtmlDocumentTypeIdentifier {
             return $this->isDoctypeLine($nonBlankLines[0]);
         }
         
-        return $this->isDoctypeLine($nonBlankLines[0]) || ($this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1]));
-        
-        if (count($nonBlankLines) < 2) {
-            return false;
+        if ($this->isDoctypeLine($nonBlankLines[0])) {
+            return true;
         }
         
-        return $this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1]);
+        if ($this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1])) {
+            return true;
+        }
+        
+        if ($this->isCommentLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1])) {
+            return true;
+        }        
+        
+        return false;
     }
     
 
@@ -157,6 +164,16 @@ class HtmlDocumentTypeIdentifier {
      */
     private function isXmlDeclarationLine($line) {                
         return preg_match(self::XML_DECLARATION_LINE_PATTERN, $line) > 0;
+    }
+    
+    
+    /**
+     * 
+     * @param string $line
+     * @return boolean
+     */
+    private function isCommentLine($line) {                
+        return preg_match(self::COMMENT_LINE_PATTERN, $line) > 0;
     }
     
     

@@ -116,5 +116,12 @@ class HasValidDocumentTypeTest extends BaseTest {
         $identifier->setHtml($this->getFixture('xhtmlrdfa.html'));
         
         $this->assertTrue($identifier->hasValidDocumentType());
+    }
+    
+    public function testHtml5WithPrecedingComment() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('html5-with-preceding-comment.html'));        
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
     }      
 }

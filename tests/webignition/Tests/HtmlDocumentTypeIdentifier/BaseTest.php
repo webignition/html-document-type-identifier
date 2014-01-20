@@ -45,6 +45,37 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     }
     
     
+    /**
+     * 
+     * @return string
+     */
+    protected function getDataKey() {
+        return \ICanBoogie\hyphenate(str_replace('test', '', $this->getName()));        
+    }    
+    
+    
+    /**
+     * 
+     * @param array $doctypeCollection
+     * @return array
+     */
+    protected function getKeyNormalisedDoctypeCollection($doctypeCollection) {
+        foreach ($doctypeCollection as $key => $value) {            
+            $normalisedKey = str_replace('+', '-', $key);
+            unset($doctypeCollection[$key]);
+            $doctypeCollection[$normalisedKey] = $value;            
+        }
         
+        return $doctypeCollection;        
+    } 
+    
+
+    protected function generateFixtureFromTemplate($key, $doctypeString) {
+        $key = preg_replace('/-alternative[0-9]?/', '', str_replace(array(
+            '-legacy-compat'
+        ), '', $key));
+        
+        return str_replace('{{DOCTYPE}}', $doctypeString, $this->getFixture('Templates/'.$key . '.html'));       
+    }    
     
 }

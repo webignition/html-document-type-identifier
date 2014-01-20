@@ -1,6 +1,8 @@
 <?php
 namespace webignition\HtmlDocumentTypeIdentifier;
 
+use webignition\HtmlDocumentType\Generator;
+
 /**
  * 
  */
@@ -9,21 +11,9 @@ class HtmlDocumentTypeIdentifier {
     const DOCTYPE_LINE_PATTERN = '/^<!doctype\s+(html)/i';
     const XML_DECLARATION_LINE_PATTERN = '/^<\?xml\s+/i';
     const COMMENT_LINE_PATTERN = '/^<!--/i';
+    const DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING = ' "">';
     
-    private $publicIdToSystemIdMap = array(
-        '-//W3C//DTD HTML 4.01//EN' => 'http://www.w3.org/TR/html4/strict.dtd',
-        '-//W3C//DTD HTML 4.01 Transitional//EN' => 'http://www.w3.org/TR/html4/loose.dtd',
-        '-//W3C//DTD HTML 4.01 Frameset//EN' => 'http://www.w3.org/TR/html4/frameset.dtd',
-        '-//W3C//DTD XHTML 1.0 Strict//EN' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd',
-        '-//W3C//DTD XHTML 1.0 Transitional//EN' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd',
-        '-//W3C//DTD XHTML 1.0 Frameset//EN' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd',
-        '-//W3C//DTD XHTML 1.1//EN' => 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd',
-        '-//W3C//DTD XHTML Basic 1.1//EN' => 'http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd',
-        '-//IETF//DTD HTML 2.0//EN' => '',
-        '-//W3C//DTD HTML 3.2 Final//EN' => '',
-        '-//W3C//DTD XHTML Basic 1.0//EN' => 'http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd',
-        '-//W3C//DTD XHTML+RDFa 1.0//EN' => 'http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd',
-    );
+    private $validFpiList = null;
     
     private $nonDtdDocumentTypeStrings = array(
         '<!DOCTYPE html>'
@@ -47,7 +37,7 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @param string $html
      */
-    public function setHtml($html) {        
+    public function setHtml($html) {                
         if (!$this->hasDoctypeLine($html)) {
             $this->documentTypeObject = null;
             $this->documentTypeString = '';
@@ -61,12 +51,32 @@ class HtmlDocumentTypeIdentifier {
         $domDocument = new \DOMDocument();        
         $domDocument->loadHTML($html);
         
-        libxml_use_internal_errors($currentLibXmlUseInternalErrors);
+        libxml_use_internal_errors($currentLibXmlUseInternalErrors);        
         
-        
-        $this->documentTypeObject = $domDocument->doctype;
+        $this->documentTypeObject = $domDocument->doctype;        
         $this->documentTypeString = $domDocument->doctype->ownerDocument->saveXml($domDocument->doctype);  
         
+        $this->translateDoctypePrefixToUppercase();
+        $this->removeSuperfluousMissingUriContent();        
+    }
+    
+    private function removeSuperfluousMissingUriContent() {       
+        if ($this->isMissingUriContent()) {
+            $this->documentTypeString = preg_replace('/' . self::DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING . '$/i', '>', $this->documentTypeString);
+        }
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    private function isMissingUriContent() {
+        return substr($this->documentTypeString, strlen($this->documentTypeString) - strlen(self::DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING)) == self::DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING;
+    }
+    
+    
+    private function translateDoctypePrefixToUppercase() {
         $this->documentTypeString = preg_replace('/^\<\!doctype html/i', '<!DOCTYPE html', $this->documentTypeString);
     }
     
@@ -110,7 +120,7 @@ class HtmlDocumentTypeIdentifier {
             return true;
         }
         
-        return isset($this->publicIdToSystemIdMap[$this->documentTypeObject->publicId]);
+        return in_array($this->documentTypeObject->publicId, $this->getValidFpiList());
     }
     
     
@@ -195,6 +205,16 @@ class HtmlDocumentTypeIdentifier {
         }
         
         return $nonBlankLines;
+    }
+    
+    
+    private function getValidFpiList() {
+        if (is_null($this->validFpiList)) {
+            $generator = new Generator();
+            $this->validFpiList = $generator->getFpis();
+        }
+        
+        return $this->validFpiList;
     }
     
 }

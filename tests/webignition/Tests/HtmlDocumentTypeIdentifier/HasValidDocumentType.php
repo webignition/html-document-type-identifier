@@ -4,7 +4,7 @@ namespace webignition\Tests\HtmlDocumentTypeIdentifier;
 
 use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
 
-class GetDocumentTypeTest extends BaseTest {
+class HasValidDocumentType extends BaseTest {
     
     public function setUp() {
         $this->setTestFixturePath(__CLASS__, $this->getName());
@@ -13,113 +13,136 @@ class GetDocumentTypeTest extends BaseTest {
     public function testHtml401Strict() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401strict.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }
   
     public function testHtml401Transitional() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401transitional.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }    
     
     public function testHtml401Frameset() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html401frameset.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }     
     
     public function testXhtml10Strict() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10strict.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }     
     
     public function testXhtml10Transitional() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10transitional.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }       
     
     public function testXhtml10Frameset() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10frameset.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }
     
     public function testXhtml11() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml11.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }     
     
     public function testXhtml11Basic() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml11basic.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.1//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic11.dtd">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }      
     
     public function testHtml5() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html5.html'));        
-        $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
+        
+        $identifier->setHtml($this->getFixture('html5-lowercase.html'));        
+        $this->assertTrue($identifier->hasValidDocumentType());        
+        
+        $identifier->setHtml($this->getFixture('html5-mixedcase.html'));        
+        $this->assertTrue($identifier->hasValidDocumentType());        
     }      
     
     public function testHtml2() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html2.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN" "">', $identifier->getDocumentTypeString());
+        $this->assertTrue($identifier->hasValidDocumentType());
     }       
     
     public function testHtml32() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html32.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN" "">', $identifier->getDocumentTypeString());
-    }     
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }    
     
-    
-    public function testXml10Basic() {
+    public function testXhml10Basic() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtml10basic.html'));        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML Basic 1.0//EN" "http://www.w3.org/TR/xhtml-basic/xhtml-basic10.dtd">', $identifier->getDocumentTypeString());
-    }
+        $this->assertTrue($identifier->hasValidDocumentType());
+    } 
     
+    public function testInvalidXhtml10Xhtml11Mixup() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('invalid-xhtml10-xhtml11-mixup.html'));        
+        $this->assertFalse($identifier->hasValidDocumentType());        
+    }
     
     public function testNoDoctype() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('no-doctype.html'));
-        $this->assertEquals('', $identifier->getDocumentTypeString());
-    }    
-    
+        $this->assertFalse($identifier->hasValidDocumentType());
+    }
     
     public function testWithNoDocument() {
         $identifier = new HtmlDocumentTypeIdentifier();
-        $this->assertEquals('', $identifier->getDocumentTypeString());        
-    }
-    
+        $this->assertFalse($identifier->hasValidDocumentType()); 
+    }  
     
     public function testWithBlankLinesBeforeDoctypeDeclaration() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('blank-lines-before-doctype.html'));
-        $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());        
-    }
-    
-    public function testXhtmlWithXmlPrefix() {
-        $identifier = new HtmlDocumentTypeIdentifier();      
-        $identifier->setHtml($this->getFixture('xhtml10transitional-with-xml-prefix.html'));        
-        
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">', $identifier->getDocumentTypeString());            
-    }
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }   
     
     public function testXhtmlRfda() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('xhtmlrdfa.html'));
         
-        $this->assertEquals('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">', $identifier->getDocumentTypeString());                    
+        $this->assertTrue($identifier->hasValidDocumentType());
     }
     
     public function testHtml5WithPrecedingComment() {
         $identifier = new HtmlDocumentTypeIdentifier();        
         $identifier->setHtml($this->getFixture('html5-with-preceding-comment.html'));        
-        $this->assertEquals('<!DOCTYPE html>', $identifier->getDocumentTypeString());
-    }        
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }    
+    
+    public function testHtml40Strict() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('html40strict.html'));        
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }
+  
+    public function testHtml40Transitional() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('html40transitional.html'));        
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }    
+    
+    public function testHtml40Frameset() {
+        $identifier = new HtmlDocumentTypeIdentifier();        
+        $identifier->setHtml($this->getFixture('html40frameset.html'));        
+        
+        $this->assertTrue($identifier->hasValidDocumentType());
+    }      
 }

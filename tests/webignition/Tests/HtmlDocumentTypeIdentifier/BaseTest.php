@@ -2,15 +2,53 @@
 
 namespace webignition\Tests\HtmlDocumentTypeIdentifier;
 
+use webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier;
+use webignition\HtmlDocumentType\Generator;
+
 abstract class BaseTest extends \PHPUnit_Framework_TestCase {  
     
     const FIXTURES_BASE_PATH = '/../../../fixtures';
     
     /**
      *
+     * @var \webignition\HtmlDocumentType\Generator
+     */
+    private $generator;
+    
+    /**
+     *
+     * @var \webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier
+     */
+    private $identifier;    
+    
+    /**
+     *
      * @var string
      */
     private $fixturePath = null;    
+    
+    public function setUp() {
+        $this->setTestFixturePath(__CLASS__, $this->getName());
+        
+        $this->generator = new Generator();
+        $this->identifier = new HtmlDocumentTypeIdentifier();             
+    }    
+    
+    /**
+     * 
+     * @return \webignition\HtmlDocumentType\Generator
+     */
+    protected function getGenerator() {
+        return $this->generator;
+    }
+    
+    /**
+     * 
+     * @return \webignition\HtmlDocumentTypeIdentifier\HtmlDocumentTypeIdentifier
+     */
+    protected function getIdentifier() {
+        return $this->identifier;
+    }    
 
     /**
      * 
@@ -70,12 +108,25 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     } 
     
 
+    /**
+     * 
+     * @param string $key
+     * @param string $doctypeString
+     * @return string
+     */
     protected function generateFixtureFromTemplate($key, $doctypeString) {
         $key = preg_replace('/-alternative[0-9]?/', '', str_replace(array(
             '-legacy-compat'
         ), '', $key));
         
         return str_replace('{{DOCTYPE}}', $doctypeString, $this->getFixture('Templates/'.$key . '.html'));       
+    } 
+    
+    
+    protected function getFixtureContent() {
+        $dataKey = $this->getDataKey();
+        $underTestDoctypeCollection = $this->getKeyNormalisedDoctypeCollection($this->getUnderTestDoctypeCollection());
+        return $this->generateFixtureFromTemplate($dataKey, $underTestDoctypeCollection[$dataKey]);
     }    
     
 }

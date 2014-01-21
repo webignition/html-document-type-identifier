@@ -8,15 +8,14 @@ use webignition\HtmlDocumentType\Generator;
  */
 class HtmlDocumentTypeIdentifier {
     
-    const DOCTYPE_LINE_PATTERN = '/^<!doctype\s+(html)/i';
-    const XML_DECLARATION_LINE_PATTERN = '/^<\?xml\s+/i';
-    const COMMENT_LINE_PATTERN = '/^<!--/i';
-    const DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING = ' "">';
+    const DOCUMENT_TYPE_STRING_WITH_MISSING_URI_ENDING = ' "">';    
+    const DEFAULT_DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">';
     
     private $validFpiList = null;
     
     private $nonDtdDocumentTypeStrings = array(
-        '<!DOCTYPE html>'
+        '<!DOCTYPE html>',
+        '<!DOCTYPE html SYSTEM "about:legacy-compat">'
     );
     
     
@@ -24,41 +23,88 @@ class HtmlDocumentTypeIdentifier {
      *
      * @var \DOMDocumentType
      */
-    private $documentTypeObject;
+    private $documentTypeObject = null;
     
     
     /**
      *
      * @var string
      */
-    private $documentTypeString = '';    
+    private $documentTypeString = null;    
+    
+    
+    /**
+     *
+     * @var string
+     */
+    private $sourceHtml = '';
+    
+    
+    /**
+     *
+     * @var \DOMDocument
+     */
+    private $sourceDom = null;
     
     /**
      * 
      * @param string $html
      */
-    public function setHtml($html) {                
-        if (!$this->hasDoctypeLine($html)) {
-            $this->documentTypeObject = null;
-            $this->documentTypeString = '';
-            return;
+    public function setHtml($html) {
+        $this->sourceHtml = trim($html);
+        $this->sourceDom = null;
+        $this->documentTypeObject = null;
+    }
+    
+    
+    /**
+     * 
+     * @return \DOMDocument
+     */
+    private function getSourceDom() {
+        if (is_null($this->sourceDom)) {
+            $currentLibXmlUseInternalErrors = libxml_use_internal_errors();
+
+            libxml_use_internal_errors(true);
+
+            $this->sourceDom = new \DOMDocument();
+            
+            if ($this->sourceHtml != '') {
+                $this->sourceDom->loadHTML($this->sourceHtml);
+            }
+
+            libxml_use_internal_errors($currentLibXmlUseInternalErrors);             
         }
         
-        $currentLibXmlUseInternalErrors = libxml_use_internal_errors();
-        
-        libxml_use_internal_errors(true);
-        
-        $domDocument = new \DOMDocument();        
-        $domDocument->loadHTML($html);
-        
-        libxml_use_internal_errors($currentLibXmlUseInternalErrors);        
-        
-        $this->documentTypeObject = $domDocument->doctype;        
-        $this->documentTypeString = $domDocument->doctype->ownerDocument->saveXml($domDocument->doctype);  
-        
-        $this->translateDoctypePrefixToUppercase();
-        $this->removeSuperfluousMissingUriContent();        
+        return $this->sourceDom;
     }
+    
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getDocumentTypeString() {
+        if (is_null($this->documentTypeString)) {
+            if (is_null($this->getSourceDom()->doctype)) {
+                $this->documentTypeString = '';
+            } else {
+                $this->documentTypeString = $this->getSourceDom()->doctype->ownerDocument->saveXml($this->getSourceDom()->doctype);
+            }         
+            
+            $this->setDoctypePrefixAndRootElementToCorrectCase();
+            $this->removeSuperfluousMissingUriContent();
+            
+            if (!$this->hasDocumentType()) {
+                $this->documentTypeString = '';
+                $this->documentTypeObject = null;
+                $this->sourceDom = null;
+            }
+        }
+        
+        return $this->documentTypeString;
+    }
+    
     
     private function removeSuperfluousMissingUriContent() {       
         if ($this->isMissingUriContent()) {
@@ -76,7 +122,7 @@ class HtmlDocumentTypeIdentifier {
     }
     
     
-    private function translateDoctypePrefixToUppercase() {
+    private function setDoctypePrefixAndRootElementToCorrectCase() {
         $this->documentTypeString = preg_replace('/^\<\!doctype html/i', '<!DOCTYPE html', $this->documentTypeString);
     }
     
@@ -85,126 +131,57 @@ class HtmlDocumentTypeIdentifier {
      * 
      * @return boolean
      */
-    public function hasDocumentType() {
-        if (is_null($this->documentTypeObject)) {
-            return false;
-        }
-        
-        return $this->documentTypeString != '';
-    }
-    
-    
-    /**
-     * 
-     * @return string
-     */
-    public function getDocumentTypeString() {
-        return $this->documentTypeString;
-    }
-    
-    
-    /**
-     * 
-     * @return boolean
-     */
-    public function hasValidDocumentType() {        
-        if (!$this->documentTypeObject instanceof \DOMDocumentType) {
-            return false;
-        }
-        
-        if (strtolower($this->documentTypeObject->name) != 'html') {
-            return false;
-        }
-        
-        if (in_array($this->documentTypeString, $this->nonDtdDocumentTypeStrings)) {
+    public function hasDocumentType() {        
+        if ($this->documentTypeString != '' && $this->documentTypeString != self::DEFAULT_DOCTYPE) {
             return true;
         }
         
-        return in_array($this->documentTypeObject->publicId, $this->getValidFpiList());
-    }
-    
-    
-    /**
-     * 
-     * @param string $html
-     * @return boolean
-     */
-    private function hasDoctypeLine($html) { 
-        $html = preg_replace("/^\xef\xbb\xbf/", '', $html); 
-        
-        $nonBlankLines = $this->getNonBlankLines($html);
-        if (count($nonBlankLines) === 0) {
-            return false;
-        }
-        
-        if (count($nonBlankLines) === 1) {
-            return $this->isDoctypeLine($nonBlankLines[0]);
-        }
-        
-        if ($this->isDoctypeLine($nonBlankLines[0])) {
+        if ($this->sourceHtmlProbablyContainsDefaultDoctype()) {
             return true;
         }
-        
-        if ($this->isXmlDeclarationLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1])) {
-            return true;
-        }
-        
-        if ($this->isCommentLine($nonBlankLines[0]) && $this->isDoctypeLine($nonBlankLines[1])) {
-            return true;
-        }        
         
         return false;
     }
     
-
-    /**
-     * 
-     * @param string $line
-     * @return boolean
-     */    
-    private function isDoctypeLine($line) {
-        return preg_match(self::DOCTYPE_LINE_PATTERN, $line) > 0;
-    }
-    
     
     /**
      * 
-     * @param string $line
      * @return boolean
      */
-    private function isXmlDeclarationLine($line) {                
-        return preg_match(self::XML_DECLARATION_LINE_PATTERN, $line) > 0;
-    }
-    
-    
-    /**
-     * 
-     * @param string $line
-     * @return boolean
-     */
-    private function isCommentLine($line) {                
-        return preg_match(self::COMMENT_LINE_PATTERN, $line) > 0;
-    }
-    
-    
-    
-    /**
-     * 
-     * @param string $html
-     * @return array
-     */
-    private function getNonBlankLines($html) {        
-        $lines = explode("\n", $html);
-        $nonBlankLines = array();
+    private function sourceHtmlProbablyContainsDefaultDoctype() {
+        $doctypeStartIndex = stripos($this->sourceHtml, '<!DOCTYPE');
+        $htmlStartElementIndex = stripos($this->sourceHtml, 'html');
         
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line !== '') {
-                $nonBlankLines[] = $line;
-            }
+        if ($doctypeStartIndex === false) {
+            return false;
         }
         
-        return $nonBlankLines;
+        if ($htmlStartElementIndex < $doctypeStartIndex) {
+            return false;
+        }
+        
+        return true;      
+    }
+    
+    
+    /**
+     * 
+     * @return boolean
+     */
+    public function hasValidDocumentType() {
+        if (!$this->hasDocumentType()) {
+            return false;
+        }
+        
+        if (strtolower($this->getSourceDom()->doctype->name) != 'html') {
+            return false;
+        }
+        
+        if (in_array($this->getDocumentTypeString(), $this->nonDtdDocumentTypeStrings)) {
+            return true;
+        }
+        
+        return in_array($this->getSourceDom()->doctype->publicId, $this->getValidFpiList());
     }
     
     

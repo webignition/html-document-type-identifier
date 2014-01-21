@@ -8,10 +8,6 @@ use webignition\Tests\HtmlDocumentTypeIdentifier\BaseTest;
  * @todo: test with no space between fpi and uri
  * @note: w3c html validator is happy with such doctypes, need to be sure
  *         they are recognised as valid
- * 
- * @todo: test mixed case doctype e.g. <!dOCtyPe hTMl>
- * @todo: test upper case doctype e.g. <!DOCTYPE hTMl>
- * @todo: test lower case doctype e.g. <!doctype hTMl> 
  */
 
 abstract class GetDocumentTypeTest extends BaseTest {

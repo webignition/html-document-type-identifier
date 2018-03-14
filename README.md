@@ -1,4 +1,1 @@
-html-document-type-identifier
-=============================
-
-Given the source of an HTML document, identify the document type
+This package has been abandoned and superseded by [webignition/html-document-type](https://github.com/webignition/html-document-type)
